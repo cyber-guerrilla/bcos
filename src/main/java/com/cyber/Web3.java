@@ -8,7 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 
@@ -19,23 +21,30 @@ import java.math.BigInteger;
  */
 public class Web3 extends Bootstrap {
     private static Logger logger = LoggerFactory.getLogger(Web3.class);
+    private Service service;
 
-    @Autowired
-    public Service service;
+    public Web3(Service service) {
+        this.service = service;
+    }
+
     public static void main(String[] args) throws Exception {
-        //读取配置文件，SDK与区块链节点建立连接
-        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-        Service service = context.getBean(Service.class);
+        try (ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext("applicationContext.xml")) {
+            appContext.registerShutdownHook();
+            Service service = appContext.getBean(Service.class);
+            Web3 web = new Web3(service);
+            logger.info("{}", web.getBlockNumber());
+            appContext.stop();
+        }
+    }
+
+    public BigInteger getBlockNumber() throws Exception {
         service.run();
-        logger.info("run");
         ChannelEthereumService channelEthereumService = new ChannelEthereumService();
         channelEthereumService.setChannelService(service);
 
         //获取Web3j对象
         Web3j web3j = Web3j.build(channelEthereumService, service.getGroupId());
-        logger.info("build");
         //通过Web3j对象调用API接口getBlockNumber
-        BigInteger blockNumber = web3j.getBlockNumber().send().getBlockNumber();
-        logger.info("{}",blockNumber);
+        return web3j.getBlockNumber().send().getBlockNumber();
     }
 }
