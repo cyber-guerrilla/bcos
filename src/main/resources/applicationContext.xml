@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/util
+   		   http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:property-placeholder
+            location="classpath:conf.properties,
+                      classpath:conf/conf-deploy.properties,
+                      file:conf/conf-deploy.properties"
+            ignore-resource-not-found="true"
+    />
+
+    <bean id="encryptType" class="org.fisco.bcos.web3j.crypto.EncryptType">
+        <constructor-arg value="0"/> <!-- 0:standard 1:guomi -->
+    </bean>
+
+    <bean id="group1" class="org.fisco.bcos.channel.handler.ChannelConnections"
+    p:caCertPath="${ca.Cert.Path}"
+    p:nodeCaPath="${node.Ca.Path}"
+    p:nodeKeyPath="${node.Key.Path}">
+
+        <property name="groupId" value="1"/> <!-- 群组的groupID -->
+        <property name="connectionsStr">
+            <list>
+                <value>${node0}</value>  <!-- IP:channel_port -->
+                <value>${node1}</value>
+                <value>${node2}</value>
+                <value>${node3}</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="groupChannelConnectionsConfig" class="org.fisco.bcos.channel.handler.GroupChannelConnectionsConfig">
+        <property name="allChannelConnections">
+            <list value-type="org.fisco.bcos.channel.handler.ChannelConnections">
+                <ref bean="group1"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="channelService" class="org.fisco.bcos.channel.client.Service" depends-on="groupChannelConnectionsConfig">
+        <property name="groupId" value="1"/> <!-- 配置连接群组1 -->
+        <property name="agencyName" value="fisco"/> <!-- 配置机构名 -->
+        <property name="allChannelConnections" ref="groupChannelConnectionsConfig"/>
+    </bean>
+
+</beans>
