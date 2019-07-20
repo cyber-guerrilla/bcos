@@ -21,7 +21,7 @@
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
-        <charset>UTF-8</charset>
+<!--        <charset>UTF-8</charset>-->
     </appender>
 
     <appender name="appenderError" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -39,7 +39,7 @@
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
-        <charset>UTF-8</charset>
+<!--        <charset>UTF-8</charset>-->
     </appender>
 
 
