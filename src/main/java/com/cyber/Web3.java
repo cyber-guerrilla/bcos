@@ -22,6 +22,7 @@ public class Web3 extends Bootstrap {
         //读取配置文件，SDK与区块链节点建立连接
         ApplicationContext context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
         Service service = context.getBean(Service.class);
+        logger.info("before run");
         service.run();
         logger.info("run");
         ChannelEthereumService channelEthereumService = new ChannelEthereumService();
