@@ -1,6 +1,6 @@
 package com.cyber;
 
-import com.cyber.client.AssetClient;
+import com.cyber.client.MyClient;
 import org.fisco.bcos.channel.client.Service;
 import org.fisco.bcos.web3j.protocol.Web3j;
 import org.fisco.bcos.web3j.protocol.channel.ChannelEthereumService;
@@ -33,8 +33,8 @@ public class Web3 extends Bootstrap {
             appContext.registerShutdownHook();
             Service service = appContext.getBean(Service.class);
             Web3 web = new Web3(service);
-            AssetClient client = new AssetClient();
-            client.initialize();
+//            MyClient client = new MyClient();
+//            client.init();
             logger.info("{}", web.getBlockNumber());
             appContext.stop();
         }

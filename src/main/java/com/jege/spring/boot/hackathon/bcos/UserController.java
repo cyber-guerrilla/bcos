@@ -25,16 +25,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 
-import org.fisco.bcos.asset.contract.Asset;
-import org.fisco.bcos.web3j.tx.gas.ContractGasProvider;
-import org.fisco.bcos.web3j.abi.datatypes.Type;
+import com.cyber.contracts.Asset;
 
 @RestController
 public class UserController {
     private static Logger logger = LoggerFactory.getLogger(Web3.class);
 
-    @RequestMapping("/user/getnew")
-    public String getnew() throws Exception {
+    @RequestMapping(value = "/user", method = RequestMethod.PUT)
+    public String newuser() throws Exception {
         //读取配置文件，SDK与区块链节点建立连接
         ApplicationContext context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
         Service service = context.getBean(Service.class);
@@ -50,19 +48,16 @@ public class UserController {
         BigInteger blockNumber = web3j.getBlockNumber().send().getBlockNumber();
         logger.info("blockNum: {}",blockNumber);
 
-
         //创建普通外部账户
         EncryptType.encryptType = 0;
-//创建国密外部账户，向国密区块链节点发送交易需要使用国密外部账户
-// EncryptType.encryptType = 1;
         Credentials credentials = GenCredential.create();
-//账户地址
+        //账户地址
         String address = credentials.getAddress();
         logger.info("address: {}",address);
-//账户私钥
+        //账户私钥
         String privateKey = credentials.getEcKeyPair().getPrivateKey().toString(16);
         logger.info("privateKey: {}",privateKey);
-//账户公钥
+        //账户公钥
         String publicKey = credentials.getEcKeyPair().getPublicKey().toString(16);
         logger.info("publicKey: {}",publicKey);
         JSONObject userinfo = new JSONObject();
@@ -72,64 +67,96 @@ public class UserController {
         return userinfo.toJSONString();
     }
 
-    @RequestMapping("/hello2")
-    public List<String> hello2() {
-        return Arrays.asList(new String[] { "A", "B", "C" });
-    }
+//    @RequestMapping(value = "/contract", method = RequestMethod.PUT, consumes = "text/plain")
+//    public String contract(@RequestBody String payload) throws Exception {
+//        JSONObject req = JSON.parseObject(payload);
+//        String privateKey = req.getString("priv");
+//        //读取配置文件，sdk与区块链节点建立连接，获取web3j对象
+//        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+//        Service service = context.getBean(Service.class);
+//        service.run();
+//        ChannelEthereumService channelEthereumService = new ChannelEthereumService();
+//        channelEthereumService.setChannelService(service);
+//        channelEthereumService.setTimeout(10000);
+//        Web3j web3j = Web3j.build(channelEthereumService, service.getGroupId());
+//        //准备部署和调用合约的参数
+//        BigInteger gasPrice = new BigInteger("300000000");
+//        BigInteger gasLimit = new BigInteger("300000000");
+//        //指定外部账户私钥，用于交易签名
+//        Credentials credentials = GenCredential.create(privateKey);
+//        //部署合约
+//        Asset contract = Asset.deploy(web3j, credentials, new StaticGasProvider(gasPrice, gasLimit)).send();
+//
+//        String address = contract.getContractAddress();
+//
+//        JSONObject contractinfo = new JSONObject();
+//        contractinfo.put("address", address);
+//        return contractinfo.toJSONString();
+//    }
 
-    @RequestMapping(value = "/testdeploy", method = RequestMethod.POST, consumes = "text/plain")
-    public String testdeploy(@RequestBody String payload) throws Exception {
+    @RequestMapping(value = "/regist", method = RequestMethod.POST, consumes = "text/plain")
+    public String setvalue(@RequestBody String payload) throws Exception {
         JSONObject req = JSON.parseObject(payload);
-        //读取配置文件，sdk与区块链节点建立连接，获取web3j对象
-        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-        Service service = context.getBean(Service.class);
-        service.run();
-        ChannelEthereumService channelEthereumService = new ChannelEthereumService();
-        channelEthereumService.setChannelService(service);
-        channelEthereumService.setTimeout(10000);
-        Web3j web3j = Web3j.build(channelEthereumService, service.getGroupId());
-        //准备部署和调用合约的参数
-        BigInteger gasPrice = new BigInteger("300000000");
-        BigInteger gasLimit = new BigInteger("300000000");
         String privateKey = req.getString("priv");
-        //指定外部账户私钥，用于交易签名
-        Credentials credentials = GenCredential.create(privateKey);
-        //部署合约
-        Asset contract = Asset.deploy(web3j, credentials, new StaticGasProvider(gasPrice, gasLimit)).send();
-
-        String address = contract.getContractAddress();
-
-        JSONObject contractinfo = new JSONObject();
-        contractinfo.put("address", address);
-        return contractinfo.toJSONString();
-    }
-
-    @RequestMapping(value = "/testsend", method = RequestMethod.POST, consumes = "text/plain")
-    public List<String> testsend(@RequestBody String payload) throws Exception {
-        JSONObject req = JSON.parseObject(payload);
-        //读取配置文件，sdk与区块链节点建立连接，获取web3j对象
-        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-        Service service = context.getBean(Service.class);
-        service.run();
-        ChannelEthereumService channelEthereumService = new ChannelEthereumService();
-        channelEthereumService.setChannelService(service);
-        channelEthereumService.setTimeout(10000);
-        Web3j web3j = Web3j.build(channelEthereumService, service.getGroupId());
-        //准备部署和调用合约的参数
-        BigInteger gasPrice = new BigInteger("300000000");
-        BigInteger gasLimit = new BigInteger("300000000");
-        String privateKey = req.getString("priv");
-        //指定外部账户私钥，用于交易签名
-        Credentials credentials = GenCredential.create(privateKey);
         String address = req.getString("conaddress");
+        String username = req.getString("username");
+        String money = req.getString("money");
+        //读取配置文件，sdk与区块链节点建立连接，获取web3j对象
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+        Service service = context.getBean(Service.class);
+        service.run();
+        ChannelEthereumService channelEthereumService = new ChannelEthereumService();
+        channelEthereumService.setChannelService(service);
+        channelEthereumService.setTimeout(10000);
+        Web3j web3j = Web3j.build(channelEthereumService, service.getGroupId());
+        //准备部署和调用合约的参数
+        BigInteger gasPrice = new BigInteger("300000000");
+        BigInteger gasLimit = new BigInteger("300000000");
+        //指定外部账户私钥，用于交易签名
+        Credentials credentials = GenCredential.create(privateKey);
         //根据合约地址加载合约
         Asset contract = Asset.load(address, web3j, credentials, new StaticGasProvider(gasPrice, gasLimit));
         //调用合约方法发送交易
-        BigInteger value = new BigInteger("3000");
-        TransactionReceipt transactionReceipt = contract.register("Alice", value).send();
+        BigInteger value = new BigInteger(money);
+        TransactionReceipt transactionReceipt = contract.register(username, value).send();
         //查询合约方法查询该合约的数据状态
-//        Type result = contract.getRegisterEventEvents(transactionReceipt);
+//        Type result = contract.getRegisterEventEvents(transactionReceipt).get(0);
 
-        return Arrays.asList(new String[]{"A", "B", "C"});
+        JSONObject contractinfo = new JSONObject();
+        contractinfo.put("result", 0);
+        return contractinfo.toJSONString();
     }
+
+//    @RequestMapping(value = "/people", method = RequestMethod.POST, consumes = "text/plain")
+//    public String people(@RequestBody String payload) throws Exception {
+//        JSONObject req = JSON.parseObject(payload);
+//        String privateKey = req.getString("priv");
+//        String address = req.getString("conaddress");
+//        String username = req.getString("username");
+//        String money = req.getString("money");
+//        //读取配置文件，sdk与区块链节点建立连接，获取web3j对象
+//        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+//        Service service = context.getBean(Service.class);
+//        service.run();
+//        ChannelEthereumService channelEthereumService = new ChannelEthereumService();
+//        channelEthereumService.setChannelService(service);
+//        channelEthereumService.setTimeout(10000);
+//        Web3j web3j = Web3j.build(channelEthereumService, service.getGroupId());
+//        //准备部署和调用合约的参数
+//        BigInteger gasPrice = new BigInteger("300000000");
+//        BigInteger gasLimit = new BigInteger("300000000");
+//        //指定外部账户私钥，用于交易签名
+//        Credentials credentials = GenCredential.create(privateKey);
+//        //根据合约地址加载合约
+//        Asset contract = Asset.load(address, web3j, credentials, new StaticGasProvider(gasPrice, gasLimit));
+//        //调用合约方法发送交易
+//        BigInteger value = new BigInteger(money);
+//        TransactionReceipt transactionReceipt = contract.(username, value).send();
+//        //查询合约方法查询该合约的数据状态
+////        Type result = contract.getRegisterEventEvents(transactionReceipt).get(0);
+//
+//        JSONObject contractinfo = new JSONObject();
+//        contractinfo.put("result", 0);
+//        return contractinfo.toJSONString();
+//    }
 }

@@ -13,3 +13,6 @@ group-channel-connections-config:
 channel-service:
   group-id: 1 # sdk实际连接的群组
   agency-name: fisco # 机构名称
+
+server:
+  port: 9999
