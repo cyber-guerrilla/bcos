@@ -26,11 +26,10 @@
     </bean>
 
     <bean id="group1" class="org.fisco.bcos.channel.handler.ChannelConnections"
-    p:caCertPath="${ca.Cert.Path}"
-    p:nodeCaPath="${node.Ca.Path}"
-    p:nodeKeyPath="${node.Key.Path}">
-
-        <property name="groupId" value="1"/> <!-- 群组的groupID -->
+          p:caCertPath="${ca.Cert.Path}"
+          p:nodeCaPath="${node.Ca.Path}"
+          p:nodeKeyPath="${node.Key.Path}"
+          p:groupId="1"><!-- 群组的groupID -->
         <property name="connectionsStr">
             <list>
                 <value>${node0}</value>  <!-- IP:channel_port -->
@@ -49,10 +48,13 @@
         </property>
     </bean>
 
-    <bean id="channelService" class="org.fisco.bcos.channel.client.Service" depends-on="groupChannelConnectionsConfig">
-        <property name="groupId" value="1"/> <!-- 配置连接群组1 -->
-        <property name="agencyName" value="fisco"/> <!-- 配置机构名 -->
-        <property name="allChannelConnections" ref="groupChannelConnectionsConfig"/>
+    <bean id="channelService" class="org.fisco.bcos.channel.client.Service" depends-on="groupChannelConnectionsConfig"
+          p:groupId="1"
+          p:agencyName="fisco"
+          p:allChannelConnections-ref="groupChannelConnectionsConfig"
+    >
+        <!--<property name="groupId" value="1"/> &lt;!&ndash; 配置连接群组1 &ndash;&gt;-->
+        <!--<property name="agencyName" value="fisco"/> &lt;!&ndash; 配置机构名 &ndash;&gt;-->
+        <!--<property name="allChannelConnections" ref="groupChannelConnectionsConfig"/>-->
     </bean>
-
 </beans>
