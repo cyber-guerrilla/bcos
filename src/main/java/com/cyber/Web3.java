@@ -6,6 +6,7 @@ import org.fisco.bcos.web3j.protocol.channel.ChannelEthereumService;
 import org.omg.CORBA.BooleanSeqHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -18,6 +19,9 @@ import java.math.BigInteger;
  */
 public class Web3 extends Bootstrap {
     private static Logger logger = LoggerFactory.getLogger(Web3.class);
+
+    @Autowired
+    public Service service;
     public static void main(String[] args) throws Exception {
         //读取配置文件，SDK与区块链节点建立连接
         ApplicationContext context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
